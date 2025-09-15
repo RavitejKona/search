@@ -1,0 +1,52 @@
+name: Convert XLSM to JSON/CSV
+
+on:
+  push:
+    branches:
+      - data   # Only trigger when pushing to data branch
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout data branch
+        uses: actions/checkout@v4
+        with:
+          ref: data
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install pandas openpyxl
+
+      - name: Convert XLSM to JSON/CSV
+        run: |
+          python - <<'EOF'
+          import pandas as pd
+          df = pd.read_excel("data.xlsm", engine="openpyxl")
+          df.to_csv("data.csv", index=False)
+          df.to_json("data.json", orient="records", indent=2)
+          EOF
+
+      - name: Checkout page branch
+        uses: actions/checkout@v4
+        with:
+          ref: page
+          path: page
+
+      - name: Copy generated files
+        run: |
+          cp data.csv page/
+          cp data.json page/
+
+      - name: Commit and push to page branch
+        run: |
+          cd page
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add data.csv data.json
+          git commit -m "Update data files from data branch" || echo "No changes"
+          git push origin page
