@@ -4,14 +4,68 @@
   <meta charset="UTF-8">
   <title>Profile Search</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    input { width: 300px; padding: 8px; font-size: 14px; }
-    .result { margin-top: 20px; border: 1px solid #ddd; padding: 12px; border-radius: 8px; }
-    .result strong { font-size: 18px; display: block; margin-bottom: 5px; }
-    .result p { margin: 2px 0; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: url('https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png') no-repeat center top;
+      background-size: 150px 150px;
+      padding-top: 180px; /* So content doesn't overlap the logo */
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header img {
+      height: 50px;
+      width: 50px;
+      margin-right: 10px;
+    }
+
+    .header span {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7bca0c;
+    }
+
+    input {
+      width: 300px;
+      padding: 8px;
+      font-size: 14px;
+      border: 2px solid #7bca0c;
+      border-radius: 5px;
+    }
+
+    .result {
+      margin-top: 20px;
+      border: 1px solid #ddd;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #42fa38;
+      color: #000; /* better readability */
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .result strong {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .result p {
+      margin: 2px 0;
+    }
   </style>
 </head>
 <body>
+  <!-- Header with logo -->
+  <div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png" alt="AIT Logo" />
+    <span>AIT Extension - HEART</span>
+  </div>
+
   <h2>Search Profiles</h2>
   <input type="text" id="searchBox" placeholder="Search anything..." />
 
