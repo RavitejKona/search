@@ -3,52 +3,64 @@ name: Convert XLSM to JSON/CSV
 on:
   push:
     branches:
-      - data   # Only trigger when pushing to data branch
-# Allow workflow to push back to the repo via GITHUB_TOKEN
+      - data   # Trigger only when pushing to data branch
+
 permissions:
-  contents: write
+  contents: write   # allow pushing to repo
+
 jobs:
   convert:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout data branch
       - name: Checkout data branch
         uses: actions/checkout@v4
         with:
           ref: data
+          fetch-depth: 0
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install pandas openpyxl
 
+      # Step 4: Convert XLSM to JSON/CSV
       - name: Convert XLSM to JSON/CSV
         run: |
+          FILE=$(ls *.xlsm | head -n 1)
+          echo "Processing $FILE"
           python - <<'EOF'
-          import pandas as pd
-          df = pd.read_excel("data.xlsm", engine="openpyxl")
+          import pandas as pd, os
+          file = [f for f in os.listdir('.') if f.endswith('.xlsm')][0]
+          df = pd.read_excel(file, engine="openpyxl")
           df.to_csv("data.csv", index=False)
           df.to_json("data.json", orient="records", indent=2)
+          print("✅ Converted", file)
           EOF
+
+      # Step 5: Checkout page branch into current workspace
       - name: Checkout page branch
         uses: actions/checkout@v4
         with:
           ref: page
-          path: page
+          fetch-depth: 0
 
+      # Step 6: Copy files
       - name: Copy generated files
         run: |
-          cp data.csv page/
-          cp data.json page/
+          cp ../data.csv .
+          cp ../data.json .
+
+      # Step 7: Commit and push
       - name: Commit and push to page branch
         run: |
-          cd page
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git add data.csv data.json
-          git commit -m "Update data files from data branch" || echo "No changes"
+          git commit -m "Update data files from data branch" || echo "No changes to commit"
           git push origin page
-Add files via upload · RavitejKona/search@34380b6 
-
