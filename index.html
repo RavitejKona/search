@@ -7,16 +7,21 @@
     body {
       font-family: Arial, sans-serif;
       margin: 40px;
-      /* Watermark background */
-      background: rgba(255,255,255,0.9) url('https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png') no-repeat center center;
-      background-size: 200px 200px; /* adjust size as needed */
-      background-attachment: fixed;
+      background: url('https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png') no-repeat center top;
+      background-size: 150px 150px;
+      padding-top: 180px; /* So content doesn't overlap the logo */
     }
 
     .header {
       display: flex;
       align-items: center;
       margin-bottom: 20px;
+    }
+
+    .header img {
+      height: 50px;
+      width: 50px;
+      margin-right: 10px;
     }
 
     .header span {
@@ -55,8 +60,9 @@
   </style>
 </head>
 <body>
-  <!-- Header without logo -->
+  <!-- Header with logo -->
   <div class="header">
+<!--     <img src="https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png" alt="AIT Logo" /> -->
     <span>AIT Extension - HEART</span>
   </div>
 
