@@ -42,7 +42,7 @@
         resultsDiv.innerHTML += `
           <div class="result">
             <strong>${r.Name || "Unknown"}</strong>
-            <p><b>Contact:</b> ${r.Contact || "N/A"}</p>
+            <p><b>Contact:</b> ${r["Contact"] || "N/A"}</p>
             <p><b>Position:</b> ${r.Position || "N/A"}</p>
             <p><b>Qualification:</b> ${r["Qualification (degrees, certifications)"] || "N/A"}</p>
           </div>
