@@ -6,57 +6,46 @@ on:
       - data   # Trigger only when pushing to data branch
 
 permissions:
-  contents: write   # allow pushing to repo
+  contents: write
 
 jobs:
   convert:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Checkout data branch
       - name: Checkout data branch
         uses: actions/checkout@v4
         with:
           ref: data
           fetch-depth: 0
 
-      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Step 3: Install dependencies
       - name: Install dependencies
         run: pip install pandas openpyxl
 
-      # Step 4: Convert XLSM to JSON/CSV
-      - name: Convert XLSM to JSON/CSV
-        run: |
-          FILE=$(ls *.xlsm | head -n 1)
-          echo "Processing $FILE"
-          python - <<'EOF'
-          import pandas as pd, os
-          file = [f for f in os.listdir('.') if f.endswith('.xlsm')][0]
-          df = pd.read_excel(file, engine="openpyxl")
-          df.to_csv("data.csv", index=False)
-          df.to_json("data.json", orient="records", indent=2)
-          print("✅ Converted", file)
-          EOF
+      - name: Run conversion script
+        run: python convert.py
 
-      # Step 5: Checkout page branch into current workspace
+      - name: Save generated files
+        run: |
+          mkdir /tmp/artifacts
+          cp data.csv /tmp/artifacts/
+          cp data.json /tmp/artifacts/
+
       - name: Checkout page branch
         uses: actions/checkout@v4
         with:
           ref: page
           fetch-depth: 0
 
-      # Step 6: Copy files
-      - name: Copy generated files
+      - name: Restore generated files
         run: |
-          cp ../data.csv .
-          cp ../data.json .
+          cp /tmp/artifacts/data.csv .
+          cp /tmp/artifacts/data.json .
 
-      # Step 7: Commit and push
       - name: Commit and push to page branch
         run: |
           git config user.name "github-actions"
