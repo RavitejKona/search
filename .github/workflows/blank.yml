@@ -3,50 +3,74 @@ name: Convert XLSM to JSON/CSV
 on:
   push:
     branches:
-      - data   # Only trigger when pushing to data branch
+      - data   # Trigger only when .xlsm is pushed to data branch
+
+permissions:
+  contents: write   # allow pushing back to the repo
 
 jobs:
   convert:
     runs-on: ubuntu-latest
+
     steps:
+      # Checkout the data branch (where .xlsm is stored)
       - name: Checkout data branch
         uses: actions/checkout@v4
         with:
           ref: data
 
+      # Install Python (for conversion script)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.x'
 
+      # Install dependencies
       - name: Install dependencies
-        run: pip install pandas openpyxl
-
-      - name: Convert XLSM to JSON/CSV
         run: |
-          python - <<'EOF'
-          import pandas as pd
-          df = pd.read_excel("data.xlsm", engine="openpyxl")
-          df.to_csv("data.csv", index=False)
-          df.to_json("data.json", orient="records", indent=2)
-          EOF
+          python -m pip install --upgrade pip
+          pip install pandas openpyxl
 
+      # Convert XLSM to CSV and JSON
+      - name: Convert XLSM to CSV/JSON
+        run: |
+          ls -l
+          FILE=$(ls *.xlsm | head -n 1)   # pick first xlsm file
+          echo "Processing $FILE"
+          python - <<'EOF'
+import pandas as pd, json, os
+
+file = [f for f in os.listdir('.') if f.endswith('.xlsm')][0]
+df = pd.read_excel(file, engine="openpyxl")
+
+# Save CSV
+df.to_csv("data.csv", index=False)
+
+# Save JSON
+df.to_json("data.json", orient="records", indent=2, force_ascii=False)
+
+print("✅ Converted:", file)
+EOF
+
+      # Checkout page branch (where we store output files)
       - name: Checkout page branch
         uses: actions/checkout@v4
         with:
           ref: page
           path: page
 
-      - name: Copy generated files
+      # Copy generated files into page branch
+      - name: Copy output files
         run: |
-          cp data.csv page/
-          cp data.json page/
+          cp data.csv data.json page/
 
-      - name: Commit and push to page branch
-        run: |
-          cd page
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add data.csv data.json
-          git commit -m "Update data files from data branch" || echo "No changes"
-          git push origin page
+      # Commit and push changes using EndBug/add-and-commit
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: github-actions
+          author_email: actions@github.com
+          message: "Update data files from data branch"
+          add: "data.csv data.json"
+          cwd: page
+          branch: page
