@@ -2,109 +2,827 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Profile Search</title>
+  <title>People Directory Search</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-/*     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
-/*       background: url('https://upload.wikimedia.org/wikipedia/en/6/6c/Asian_Institute_of_Technology-Logo.png') no-repeat center top; */
-      background-size: 150px 150px;
-      padding-top: 180px; /* So content doesn't overlap the logo */
-    } */
-
-    .header {
+    :root {
+      --page-bg: radial-gradient(120% 120% at 50% 0%, #d8f3ff 0%, #eff3ff 42%, #ffffff 100%);
+      --card-bg: #ffffff;
+      --accent: #007fa3;
+      --accent-soft: #e1f5ff;
+      --text-primary: #1d2a3b;
+      --text-secondary: #4b5a6b;
+      --shadow: 0 20px 45px rgba(39, 77, 119, 0.18);
+      --border-radius-lg: 24px;
+      --border-radius-md: 16px;
+      --border-radius-sm: 12px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: var(--page-bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .page {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 48px 28px 72px;
+    }
+    header {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .title {
+      font-size: 2.25rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .subtitle {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--text-secondary);
+      max-width: 640px;
+      line-height: 1.6;
+    }
+    .search-suite {
+      display: grid;
+      gap: 18px;
+    }
+    .search-box {
+      display: grid;
+      grid-template-columns: 64px minmax(120px, 1fr) 64px;
+      align-items: center;
+      background: var(--card-bg);
+      border-radius: var(--border-radius-lg);
+      box-shadow: var(--shadow);
+      padding: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .search-box:focus-within {
+      transform: translateY(-2px);
+      box-shadow: 0 24px 36px rgba(0, 65, 102, 0.18);
+    }
+    .logo-holder {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--border-radius-md);
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
+      justify-content: center;
+      background: var(--accent-soft);
+      overflow: hidden;
     }
-
-    .header img {
-      height: 70px;
-      width: 70px;
-      margin-right: 10px;
+    .logo-holder img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
     }
-
-    .header span {
-      font-size: 51px;
-      font-weight: bold;
-      color: #7bca0c;
+    .search-input-wrap {
+      position: relative;
+      padding: 0 12px;
     }
-
-    input {
-      width: 300px;
-      padding: 8px;
-      font-size: 14px;
-      border: 2px solid #7bca0c;
-      border-radius: 5px;
+    .search-input-wrap::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      width: 22px;
+      height: 22px;
+      background: url('data:image/svg+xml;utf8,<svg fill="%23007fa3" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27a6 6 0 10-.71.71l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0a4 4 0 110-8 4 4 0 010 8z"/></svg>') no-repeat center;
+      transform: translateY(-50%);
+      opacity: 0.8;
     }
-
-    .result {
-      margin-top: 20px;
-      border: 1px solid #ddd;
-      padding: 12px;
-      border-radius: 8px;
-      background-color: #b5ebad;
-      color: #000; /* better readability */
-      box-shadow: 0px 2px 5px rgba(0,0,0,0.2);
+    #searchBox {
+      width: 100%;
+      padding: 18px 18px 18px 48px;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: var(--text-primary);
+      border-radius: var(--border-radius-md);
+      background: transparent;
     }
-
-    .result strong {
-      font-size: 18px;
-      display: block;
-      margin-bottom: 5px;
+    #searchBox::placeholder {
+      color: rgba(29, 42, 59, 0.4);
+      font-weight: 400;
     }
-
-    .result p {
-      margin: 2px 0;
+    .meta-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      padding: 0 6px;
+    }
+    .meta-note {
+      font-size: 0.85rem;
+      color: rgba(29, 42, 59, 0.55);
+    }
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+      margin-top: 12px;
+    }
+    .profile-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius-md);
+      padding: 24px;
+      box-shadow: 0 16px 32px rgba(35, 67, 101, 0.14);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      cursor: pointer;
+      transition: transform 0.24s ease, box-shadow 0.24s ease, max-height 0.35s ease;
+      border: 1px solid rgba(0, 127, 163, 0.08);
+      position: relative;
+      overflow: hidden;
+      max-height: 220px;
+      scrollbar-width: thin;
+    }
+    .profile-card::before {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(0, 127, 163, 0.15);
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: opacity 0.25s ease, transform 0.25s ease, background 0.25s ease;
+    }
+    .profile-card::before { 
+      content: "▾";
+    }
+    .profile-card::after {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      height: 72px;
+      background: linear-gradient(to top, var(--card-bg) 0%, rgba(255, 255, 255, 0));
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+    .profile-card:hover,
+    .profile-card:focus-within {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 36px rgba(0, 65, 102, 0.18);
+      max-height: 640px;
+      overflow-y: auto;
+      z-index: 2;
+    }
+    .profile-card:hover::before,
+    .profile-card:focus-within::before {
+      opacity: 0;
+      transform: translateY(6px);
+      background: rgba(0, 127, 163, 0.25);
+    }
+    .profile-card:hover::after,
+    .profile-card:focus-within::after {
+      opacity: 0;
+    }
+    .profile-card::-webkit-scrollbar {
+      width: 6px;
+    }
+    .profile-card::-webkit-scrollbar-thumb {
+      background: rgba(0, 127, 163, 0.3);
+      border-radius: 10px;
+    }
+    .profile-card h3 {
+      margin: 0;
+      font-size: 1.35rem;
+      font-weight: 600;
+    }
+    .profile-description {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    .profile-meta {
+      margin: 0;
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+    .profile-meta strong {
+      color: var(--text-primary);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 24px;
+      border-radius: var(--border-radius-lg);
+      background: rgba(255, 255, 255, 0.74);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+      font-size: 1.05rem;
+    }
+    .error-state {
+      color: #c62828;
+      background: #ffebee;
+      border-radius: var(--border-radius-md);
+      padding: 32px;
+      font-weight: 500;
+      text-align: center;
+    }
+    .results-area {
+      display: grid;
+      gap: 24px;
+    }
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px;
+      z-index: 10;
+    }
+    .modal[hidden] {
+      display: none !important;
+    }
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(20, 36, 54, 0.45);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
+    .modal-panel {
+      position: relative;
+      z-index: 1;
+      background: #fdfefe;
+      border-radius: 24px;
+      padding: 28px 32px 32px;
+      max-width: min(820px, 92vw);
+      max-height: min(88vh, 720px);
+      width: 100%;
+      box-shadow: 0 32px 60px rgba(7, 46, 78, 0.24);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 20px;
+      overflow: hidden;
+    }
+    .modal-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 44px;
+      height: 44px;
+      background: var(--accent-soft);
+      border: none;
+      border-radius: 50%;
+      color: var(--accent);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .modal-close:hover {
+      transform: rotate(90deg);
+      background: rgba(0, 127, 163, 0.18);
+    }
+    .modal-header {
+      display: grid;
+      gap: 14px;
+      padding-right: 56px;
+      overflow: hidden;
+    }
+    .modal-title {
+      margin: 0;
+      font-weight: 700;
+      font-size: 2rem;
+      line-height: 1.2;
+      word-break: break-word;
+    }
+    .modal-description {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-height: 160px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+    }
+    .modal-body {
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      overscroll-behavior: contain;
+    }
+    .modal-details {
+      display: grid;
+      gap: 12px;
+    }
+    .modal-body::-webkit-scrollbar,
+    .modal-description::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-body::-webkit-scrollbar-thumb,
+    .modal-description::-webkit-scrollbar-thumb {
+      background: rgba(0, 127, 163, 0.3);
+      border-radius: 10px;
+    }
+    @media (max-width: 640px) {
+      .modal {
+        padding: 18px 12px;
+      }
+      .modal-panel {
+        padding: 24px 22px 28px;
+        border-radius: 20px;
+        max-height: 90vh;
+        gap: 16px;
+      }
+      .modal-close {
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+      }
+      .modal-header {
+        padding-right: 44px;
+        gap: 12px;
+      }
+      .modal-title {
+        font-size: 1.55rem;
+      }
+      .detail-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+    .detail-row {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px;
+      padding: 12px 16px;
+      border-radius: var(--border-radius-sm);
+      background: rgba(0, 127, 163, 0.08);
+    }
+    .detail-term {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .detail-value {
+      color: var(--text-secondary);
+      word-break: break-word;
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    [hidden] {
+      display: none !important;
+    }
+    @media (max-width: 768px) {
+      .page {
+        padding: 32px 18px 48px;
+      }
+      .title {
+        font-size: 1.9rem;
+      }
+      .search-box {
+        grid-template-columns: 56px minmax(100px, 1fr) 56px;
+      }
+      .logo-holder {
+        width: 56px;
+        height: 56px;
+      }
+      .results-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      }
+      .detail-row {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Header with logo -->
-  <div class="header">
-    <img src="./AITE-Logo.jpg" alt="AITE Logo" />
-    <span>AIT Extension - HEART</span>
-    <img src="./logo.jpeg" alt="HEART Logo" />
-  </div>
+  <main class="page">
+    <header>
+      <h1 class="title">People Directory</h1>
+      <p class="subtitle">
+        Search across names, roles, locations, and every other column from your Google Sheet. Replace the placeholder logos with your own to brand this directory.
+      </p>
+      <section class="search-suite">
+        <div class="search-box">
+          <div class="logo-holder">
+            <img src="./HEART Logo.svg" alt="Left logo placeholder">
+          </div>
+          <div class="search-input-wrap">
+            <label for="searchBox" class="visually-hidden">Search people</label>
+            <input id="searchBox" type="search" placeholder="Search by anything — name, city, skills…" autocomplete="off">
+          </div>
+          <div class="logo-holder">
+            <img src="https://www.extension.ait.ac.th/themes/custom/aitxtheme/logo-dark.svg" alt="Right logo placeholder">
+          </div>
+        </div>
+      </section>
+    </header>
+    <section class="results-area">
+      <div class="meta-bar">
+        <span id="resultCount" aria-live="polite">Pulling records…</span>
+        <span class="meta-note">Live data refreshed from your Google Sheet export.</span>
+      </div>
+      <div id="results" class="results-grid" aria-live="polite"></div>
+    </section>
+    <div id="profileModal" class="modal" hidden>
+      <div class="modal-overlay" data-dismiss="modal"></div>
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="profileName" aria-describedby="profileDescription">
+        <button class="modal-close" aria-label="Close profile details">×</button>
+        <header class="modal-header">
+          <h2 class="modal-title" id="profileName"></h2>
+          <p class="modal-description" id="profileDescription"></p>
+        </header>
+        <section class="modal-body">
+          <div class="modal-details" id="profileDetails"></div>
+        </section>
+      </div>
+    </div>
 
-  <h2>Search Resource Person Profiles</h2>
-  <input type="text" id="searchBox" placeholder="Search anything..." />
+    <script>
+      const searchInput = document.getElementById("searchBox");
+      const resultsContainer = document.getElementById("results");
+      const resultCount = document.getElementById("resultCount");
+      const modal = document.getElementById("profileModal");
+      const modalDetails = document.getElementById("profileDetails");
+      const modalCloseBtn = document.querySelector(".modal-close");
+      const modalOverlay = document.querySelector(".modal-overlay");
+      const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSN9kKzSSngxIT6SSJ5rRGo2MugQmYYV01ylAnV_aa2ethzSFz_RLxmnYigePv6eA/pub?output=csv"; // Publish sheet to CSV or use the GViz JSON endpoint.
 
-  <div id="results"></div>
+      let records = [];
+      let activeFilters = "";
 
-  <script>
-    let data = [];
+      const normalise = (value) => {
+        if (value === null || value === undefined) return "";
+        return value.toString().trim();
+      };
 
-    // Load JSON generated by GitHub Actions
-    fetch("data.json")
-      .then(res => res.json())
-      .then(json => data = json);
+      const escapeHtml = (value) => value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 
-    document.getElementById("searchBox").addEventListener("input", function() {
-      const query = this.value.toLowerCase();
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = "";
+      const formatValue = (value) => {
+        const text = normalise(value);
+        if (!text) return "";
+        return escapeHtml(text.replace(/[\t ]{2,}/g, " ")).replace(/\r?\n/g, "<br>");
+      };
 
-      // Filter: if any field in row contains the query
-      const results = data.filter(row => {
-        return Object.values(row).some(val =>
-          val && val.toString().toLowerCase().includes(query)
+      const normaliseKey = (key) => key.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const createKeyIndex = (record) => {
+        const index = new Map();
+        Object.keys(record || {}).forEach((key) => {
+          index.set(normaliseKey(key), key);
+        });
+        return index;
+      };
+
+      const parseCsv = (text) => {
+        const rows = [];
+        let current = [];
+        let value = "";
+        let insideQuotes = false;
+
+        for (let i = 0; i < text.length; i += 1) {
+          const char = text[i];
+          const nextChar = text[i + 1];
+
+          if (char === '"') {
+            if (insideQuotes && nextChar === '"') {
+              value += '"';
+              i += 1;
+            } else {
+              insideQuotes = !insideQuotes;
+            }
+          } else if (char === ',' && !insideQuotes) {
+            current.push(value);
+            value = "";
+          } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+            if (value !== "" || current.length) {
+              current.push(value);
+              rows.push(current);
+              current = [];
+              value = "";
+            }
+            if (char === '\r' && nextChar === '\n') {
+              i += 1;
+            }
+          } else {
+            value += char;
+          }
+        }
+
+        if (value !== "" || current.length) {
+          current.push(value);
+          rows.push(current);
+        }
+
+        return rows;
+      };
+
+      const fetchSheetRecords = async () => {
+        const trimmedUrl = SHEET_URL.trim();
+        if (!trimmedUrl) return null;
+
+        const response = await fetch(trimmedUrl, { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Sheet fetch failed (${response.status})`);
+        }
+
+        const text = await response.text();
+        const contentType = response.headers.get("content-type") || "";
+        const isCsv = trimmedUrl.includes("output=csv") || contentType.includes("text/csv");
+
+        if (isCsv) {
+          const rows = parseCsv(text);
+          if (!rows.length) return [];
+          const headers = rows[0].map((header, index) => {
+            const label = normalise(header);
+            return label || `Column ${index + 1}`;
+          });
+
+          const recordsFromCsv = rows.slice(1).map((row) => {
+            return headers.reduce((record, header, index) => {
+              record[header] = row[index] !== undefined ? row[index] : "";
+              return record;
+            }, {});
+          });
+
+          return recordsFromCsv.filter((record) =>
+            Object.values(record).some((value) => normalise(value))
+          );
+        }
+
+        const match = text.match(/google\.visualization\.Query\.setResponse\((.*)\);?/s);
+        if (!match || match.length < 2) {
+          throw new Error("Unexpected sheet response format");
+        }
+
+        const payload = JSON.parse(match[1]);
+        const columns = payload?.table?.cols || [];
+        const rows = payload?.table?.rows || [];
+
+        if (!rows.length) {
+          return [];
+        }
+
+        const headers = columns.map((col, index) => {
+          const label = (col?.label || col?.id || `Column ${index + 1}`).toString().trim();
+          return label || `Column ${index + 1}`;
+        });
+
+        const sheetRecords = rows.map(({ c }) => {
+          const cells = c || [];
+          return headers.reduce((record, header, index) => {
+            const cell = cells[index];
+            record[header] = cell && typeof cell.v !== "undefined" ? cell.v : "";
+            return record;
+          }, {});
+        });
+
+        return sheetRecords.filter((record) =>
+          Object.values(record).some((value) => normalise(value))
         );
-      });
+      };
 
-      // Show only specific fields
-      results.forEach(r => {
-        resultsDiv.innerHTML += `
-          <div class="result">
-            <strong>${r.Name || "Unknown"}</strong>
-            <p><b>Email:</b> ${ (r["Contact "] || "").match(/[\w.-]+@[\w.-]+/)?.[0] || "N/A" }</p>
-            <p><b>Position:</b> ${r["Position / Title"] || "N/A"}</p>
-            <p><b>Affiliation:</b> ${r["Affiliation \/ Organization \/ Institution"] || "N/A"}</p>
-            <p><b>Qualification:</b> ${r["Qualification (degrees, certifications)"] || "N/A"}</p>
+      const loadRecords = async () => {
+        try {
+          const sheetRecords = await fetchSheetRecords();
+          if (Array.isArray(sheetRecords) && sheetRecords.length) {
+            return sheetRecords;
+          }
+          if (Array.isArray(sheetRecords) && !sheetRecords.length) {
+            console.warn("Sheet response returned no rows; falling back to data.json");
+          }
+        } catch (error) {
+          console.warn("Failed to load Google Sheet. Falling back to data.json", error);
+        }
+
+        const response = await fetch("data.json", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Failed to load data (${response.status})`);
+        }
+
+        return response.json();
+      };
+
+      const findField = (index, candidates) => {
+        for (const candidate of candidates) {
+          if (index.has(candidate)) {
+            return index.get(candidate);
+          }
+        }
+        return null;
+      };
+
+      const renderEmpty = (message) => {
+        resultsContainer.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+      };
+
+      const renderError = (message) => {
+        resultsContainer.innerHTML = `<div class="error-state">${escapeHtml(message)}</div>`;
+      };
+
+      const hydrateModal = (record) => {
+        const keyIndex = createKeyIndex(record);
+        const nameKey = findField(keyIndex, ["name"]);
+        const descriptionKey = findField(keyIndex, [
+          "description",
+          "shortbio",
+          "shortbiobrief50100words",
+          "bio",
+          "brief"
+        ]);
+
+        const nameValue = nameKey ? record[nameKey] : record.Name;
+        const descriptionValue = descriptionKey ? record[descriptionKey] : record.Description;
+
+        modal.querySelector("#profileName").textContent = normalise(nameValue) || "Unknown";
+        modal.querySelector("#profileDescription").innerHTML = formatValue(descriptionValue) || escapeHtml("No description available.");
+
+        const detailEntries = Object.entries(record)
+          .map(([key, value]) => {
+            const label = escapeHtml(key.trim() || key);
+            const displayValue = formatValue(value) || escapeHtml("Not provided");
+            return `
+              <div class="detail-row">
+                <span class="detail-term">${label}:</span>
+                <span class="detail-value">${displayValue}</span>
+              </div>
+            `;
+          })
+          .join("");
+
+        modalDetails.innerHTML = detailEntries || `
+          <div class="detail-row">
+            <span class="detail-term">Details:</span>
+            <span class="detail-value">No additional information captured.</span>
           </div>
         `;
+      };
+
+      const openModal = (record) => {
+        hydrateModal(record);
+        modal.removeAttribute("hidden");
+        document.body.style.overflow = "hidden";
+      };
+
+      const closeModal = () => {
+        modal.setAttribute("hidden", "true");
+        document.body.style.overflow = "";
+      };
+
+      modalCloseBtn.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (event) => {
+        if (event.target.dataset.dismiss === "modal") {
+          closeModal();
+        }
       });
-    });
-  </script>
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hasAttribute("hidden")) {
+          closeModal();
+        }
+      });
+
+      const renderResults = (rows) => {
+        if (!rows.length) {
+          const message = activeFilters
+            ? `No matches for "${activeFilters}". Try adjusting your search keywords.`
+            : "No people found yet. Add entries to your Google Sheet to populate this directory.";
+          renderEmpty(message);
+          resultCount.textContent = "0 matches";
+          return;
+        }
+
+        const fragment = document.createDocumentFragment();
+
+        rows.forEach((row) => {
+          const card = document.createElement("article");
+          card.className = "profile-card";
+
+          const keyIndex = createKeyIndex(row);
+          const nameKey = findField(keyIndex, ["name"]);
+          const positionKey = findField(keyIndex, ["positiontitle", "position", "title", "designation"]);
+          const qualificationKey = findField(keyIndex, [
+            "qualification",
+            "qualificationdegreescertifications",
+            "qualifications"
+          ]);
+          const contactKey = findField(keyIndex, [
+            "contact",
+            "contactdetails",
+            "contactinformation",
+            "email",
+            "phone",
+            "mobile"
+          ]);
+          const bioKey = findField(keyIndex, [
+            "shortbio",
+            "shortbiobrief50100words",
+            "description",
+            "bio",
+            "brief"
+          ]);
+
+          const nameValue = nameKey ? row[nameKey] : row.Name;
+          const positionValue = positionKey ? row[positionKey] : row.Position || row["Position / Title"];
+          const qualificationValue = qualificationKey ? row[qualificationKey] : row.Qualification || row["Qualification (degrees, certifications)"];
+          const contactValue = contactKey ? row[contactKey] : (row.Contact ?? row["Contact "] ?? row.Email ?? row.Phone ?? row.Mobile);
+          const bioValue = bioKey ? row[bioKey] : row.Description;
+
+          const nameDisplay = escapeHtml(normalise(nameValue) || "Unknown");
+          const positionDisplay = formatValue(positionValue) || escapeHtml("Not provided");
+          const qualificationDisplay = formatValue(qualificationValue) || escapeHtml("Not provided");
+          const contactDisplay = formatValue(contactValue) || escapeHtml("Not provided");
+          const bioDisplay = formatValue(bioValue);
+
+          const metaSections = [
+            { label: "Position", value: positionDisplay },
+            { label: "Qualification", value: qualificationDisplay },
+            { label: "Contact", value: contactDisplay }
+          ];
+
+          card.innerHTML = `
+            <h3>${nameDisplay}</h3>
+            ${metaSections
+              .map(section => `<p class="profile-meta"><strong>${section.label}:</strong> ${section.value}</p>`)
+              .join("")}
+            ${bioDisplay ? `<p class="profile-description">${bioDisplay}</p>` : ""}
+          `;
+
+          card.addEventListener("click", () => openModal(row));
+          fragment.appendChild(card);
+        });
+
+        resultsContainer.innerHTML = "";
+        resultsContainer.appendChild(fragment);
+        resultCount.textContent = rows.length === 1 ? "1 match" : `${rows.length} matches`;
+      };
+
+      const filterRecords = () => {
+        const query = activeFilters.trim().toLowerCase();
+        if (!query) {
+          renderResults(records);
+          return;
+        }
+
+        const filtered = records.filter((record) =>
+          Object.values(record).some((value) =>
+            normalise(value).toLowerCase().includes(query)
+          )
+        );
+
+        renderResults(filtered);
+      };
+
+      const initialise = async () => {
+        try {
+          records = await loadRecords();
+          if (!Array.isArray(records)) {
+            records = [];
+          }
+          renderResults(records);
+        } catch (error) {
+          console.error("Directory load failed", error);
+          renderError("We couldn’t load your directory. Please verify the data source.");
+          resultCount.textContent = "Load failed";
+        }
+      };
+
+      searchInput.addEventListener("input", (event) => {
+        activeFilters = event.target.value;
+        filterRecords();
+      });
+
+      initialise();
+    </script>
+  </main>
 </body>
 </html>
